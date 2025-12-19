@@ -1,147 +1,227 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Culture du Japon</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Culture du Japon</title>
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Montserrat', sans-serif; }
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('images/11.jpg') no-repeat center center fixed;
-      background-size: cover;
-    }
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    header {
-      background: #333;
-      padding: 15px;
-      text-align: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+body {
+  font-family: 'Montserrat', sans-serif;
+  background: url('images/11.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
 
-    header a {
-      color: white;
-      text-decoration: none;
-      margin: 0 15px;
-      font-weight: 500;
-      transition: 0.3s;
-    }
+/* ============ HEADER ============ */
+header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: rgba(60,60,60,0.9);
+  z-index: 1000;
+}
 
-    header a:hover {
-      color: #e91e63;
-    }
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 25px;
+}
 
-    .container {
-      max-width: 1000px;
-      margin: 60px auto;
-      padding: 0 20px;
-    }
+.logo-header {
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+}
 
-    h1 {
-      text-align: center;
-      color: white;
-      margin-bottom: 50px;
-      font-size: 48px;
-    }
+/* ============ NAV DESKTOP ============ */
+nav {
+  display: flex;
+  gap: 30px;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 30px;
-    }
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+}
 
-    .card {
-      background: white;
-      border-radius: 15px;
-      overflow: hidden;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
+nav a:hover {
+  text-decoration: underline;
+}
 
-    .card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.15);
-    }
+/* ============ HAMBURGER ============ */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
 
-    .card img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
+}
 
-    .card-content {
-      padding: 20px;
-    }
+/* ============ MOBILE MENU ============ */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: rgba(40,40,40,0.95);
+  padding: 20px;
+}
 
-    .card-content h2 {
-      color: #e91e63;
-      margin-bottom: 15px;
-      font-size: 24px;
-    }
+.mobile-menu a {
+  color: white;
+  text-decoration: none;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+}
 
-    .card-content p {
-      line-height: 1.7;
-    }
+/* ============ CONTENT ============ */
+.container {
+  max-width: 1000px;
+  margin: 140px auto 60px;
+  padding: 0 20px;
+}
 
-    .video-section {
-      margin-top: 40px;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-    }
+h1 {
+  text-align: center;
+  color: white;
+  margin-bottom: 50px;
+  font-size: 48px;
+}
 
-    .video-section p {
-      color: #333;
-      font-size: 18px;
-      margin-bottom: 20px;
-    }
+/* ============ CARDS ============ */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
 
-    video {
-      max-width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
+.card {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  transition: 0.3s;
+}
 
-    .back {
-      display: inline-block;
-      margin: 40px auto 0;
-      background: #e91e63;
-      color: white;
-      padding: 12px 25px;
-      border-radius: 25px;
-      text-decoration: none;
-      text-align: center;
-      transition: 0.3s;
-    }
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
 
-    .back:hover {
-      background: #c2185b;
-    }
+.card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
 
-    @media (max-width: 600px) {
-      h1 { font-size: 36px; }
-      .card-content h2 { font-size: 20px; }
-    }
-  </style>
+.card-content {
+  padding: 20px;
+}
+
+.card-content h2 {
+  color: #e91e63;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.card-content p {
+  line-height: 1.7;
+}
+
+/* ============ VIDEO ============ */
+.video-section {
+  margin-top: 40px;
+  background: rgba(255,255,255,0.95);
+  padding: 30px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.video-section p {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+video {
+  max-width: 100%;
+  border-radius: 10px;
+}
+
+/* ============ BACK BUTTON ============ */
+.back {
+  display: inline-block;
+  margin: 40px auto 0;
+  background: #e91e63;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  text-decoration: none;
+}
+
+.back:hover {
+  background: #c2185b;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  nav {
+    display: none;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .mobile-menu.active {
+    display: flex;
+  }
+
+  h1 {
+    font-size: 36px;
+  }
+}
+</style>
 </head>
+
 <body>
 
 <header>
-  <a href="accueil.html">Accueil</a>
-  <a href="culture.html">Culture</a>
-  <a href="quefaire.html">Que faire ?</a>
-  <a href="tarifs.html">Tarifs</a>
-  <a href="contact.html">Contact</a>
-  <a href="game.html">Game</a>
+  <div class="header-container">
+    <div class="logo-header">⛩ Kyoto</div>
+
+    <nav>
+      <a href="accueil.html">Accueil</a>
+      <a href="culture.html">Culture</a>
+      <a href="quefaire.html">Que faire ?</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html">Game</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="accueil.html">Accueil</a>
+    <a href="culture.html">Culture</a>
+    <a href="quefaire.html">Que faire ?</a>
+    <a href="tarifs.html">Tarifs</a>
+    <a href="contact.html">Contact</a>
+    <a href="game.html">Game</a>
+  </div>
 </header>
 
 <div class="container">
@@ -149,66 +229,67 @@
 
   <div class="cards">
     <div class="card">
-      <img src="images/2.jpg" alt="Traditions Japonaises">
+      <img src="images/2.jpg">
       <div class="card-content">
         <h2>🎎 Traditions</h2>
-        <p>La cérémonie du thé, le kimono, l'ikebana et la calligraphie. Ces pratiques mettent l'accent sur la simplicité et l'harmonie.</p>
+        <p>Cérémonie du thé, kimono, ikebana et calligraphie incarnent l'harmonie japonaise.</p>
       </div>
     </div>
 
     <div class="card">
-      <img src="images/3.jpg" alt="Temple Japonais">
+      <img src="images/3.jpg">
       <div class="card-content">
-        <h2>⛩ Religion et spiritualité</h2>
-        <p>Le shintoïsme et le bouddhisme façonnent la vie quotidienne. Les sanctuaires et temples sont omniprésents et respectés par tous.</p>
+        <h2>⛩ Religion</h2>
+        <p>Shintoïsme et bouddhisme rythment la vie quotidienne et l'architecture sacrée.</p>
       </div>
     </div>
 
     <div class="card">
-      <img src="images/4.jpg" alt="Cuisine Japonaise">
+      <img src="images/4.jpg">
       <div class="card-content">
-        <h2>🍣 Cuisine japonaise</h2>
-        <p>Sushi, ramen, tempura et yakitori. La présentation est toujours esthétique et les produits sont frais et de qualité.</p>
+        <h2>🍣 Cuisine</h2>
+        <p>Sushi, ramen et tempura : un art culinaire esthétique et raffiné.</p>
       </div>
     </div>
 
     <div class="card">
-      <img src="images/5.jpg" alt="Vie moderne">
+      <img src="images/5.jpg">
       <div class="card-content">
-        <h2>🎌 Vie moderne</h2>
-        <p>Technologie avancée, animation, jeux vidéo et culture pop. Le Japon mélange traditions et modernité avec élégance.</p>
+        <h2>🎌 Modernité</h2>
+        <p>Technologie, pop culture et traditions vivent en parfaite harmonie.</p>
       </div>
     </div>
   </div>
 
   <div class="video-section">
-    <p>Découvrez la culture japonaise à travers cette vidéo :</p>
-    <video width="560" controls>
+    <p>Découvrez la culture japonaise en vidéo :</p>
+    <video controls>
       <source src="videos/mon_video.mp4" type="video/mp4">
-      Votre navigateur ne supporte pas la lecture de vidéos.
     </video>
   </div>
 
-  <div style="text-align: center;">
+  <div style="text-align:center;">
     <a href="accueil.html" class="back">← Retour à l'accueil</a>
   </div>
 </div>
 
 <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { firebaseConfig } from './firebase-config.js';
 
-  import { firebaseConfig } from './firebase-config.js';
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+// Protection
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = 'login.html';
+});
 
-  // Protection de la page
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      window.location.href = 'login.html';
-    }
-  });
+// Hamburger
+hamburger.onclick = () => {
+  mobileMenu.classList.toggle('active');
+};
 </script>
 
 </body>

@@ -5,42 +5,112 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact</title>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Montserrat', sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Montserrat', sans-serif;
       background: url('images/9.jpg') no-repeat center center fixed;
       background-size: cover;
+      min-height: 100vh;
     }
 
+    /* ===== HEADER ===== */
     header {
-      background: #333;
-      padding: 15px;
-      text-align: center;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0,0,0,0.85);
+      padding: 15px 20px;
+      z-index: 1000;
     }
 
-    header a {
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: white;
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    nav {
+      display: flex;
+      gap: 25px;
+    }
+
+    nav a {
       color: white;
       text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
+      font-weight: 500;
     }
 
+    nav a:hover {
+      color: #e91e63;
+    }
+
+    /* ===== HAMBURGER ===== */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 2px;
+    }
+
+    /* ===== MOBILE MENU ===== */
+    @media (max-width: 768px) {
+      nav {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        background: rgba(0,0,0,0.95);
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px 0;
+        display: none;
+      }
+
+      nav.active {
+        display: flex;
+      }
+
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    /* ===== CONTENT ===== */
     .container {
       max-width: 800px;
-      margin: 40px auto;
+      margin: 120px auto 40px;
       background: white;
-      padding: 30px;
+      padding: 35px;
       border-radius: 15px;
       text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
     h1 {
       margin-bottom: 30px;
+      color: #333;
     }
 
     .contact-item {
@@ -49,7 +119,7 @@
     }
 
     .contact-item span {
-      font-weight: bold;
+      font-weight: 600;
     }
 
     .back {
@@ -60,6 +130,7 @@
       padding: 12px 25px;
       border-radius: 25px;
       text-decoration: none;
+      font-weight: 500;
     }
 
     .back:hover {
@@ -71,12 +142,24 @@
 <body>
 
 <header>
-  <a href="accueil.html">Accueil</a>
-  <a href="culture.html">Culture</a>
-  <a href="quefaire.html">Que faire ?</a>
-  <a href="tarifs.html">Tarifs</a>
-  <a href="contact.html">Contact</a>
-  <a href="game.html">Game</a>
+  <div class="header-container">
+    <div class="logo">🇯🇵 Japon</div>
+
+    <nav id="navMenu">
+      <a href="accueil.html">Accueil</a>
+      <a href="culture.html">Culture</a>
+      <a href="quefaire.html">Que faire ?</a>
+      <a href="tarifs.html">Tarifs</a>
+      <a href="contact.html">Contact</a>
+      <a href="game.html">Game</a>
+    </nav>
+
+    <div class="hamburger" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
 </header>
 
 <div class="container">
@@ -97,16 +180,25 @@
   <a href="accueil.html" class="back">← Retour à l'accueil</a>
 </div>
 
+<!-- MENU SCRIPT -->
+<script>
+  const hamburger = document.getElementById("hamburger");
+  const navMenu = document.getElementById("navMenu");
+
+  hamburger.addEventListener("click", () => {
+    navMenu.classList.toggle("active");
+  });
+</script>
+
+<!-- FIREBASE PROTECTION -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
   import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-
   import { firebaseConfig } from './firebase-config.js';
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // Protection de la page
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       window.location.href = 'login.html';
