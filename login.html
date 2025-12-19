@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        .message-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 380px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 25px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 10px;
+            background: #6a11cb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #2575fc;
+        }
+
+        .error {
+            color: #e91e63;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .success {
+            color: #2e7d32;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .link {
+            margin-top: 20px;
+            color: #6a11cb;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+
+<div class="message-container">
+    <h1>Connexion</h1>
+
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button type="submit">Se connecter</button>
+    </form>
+
+    <div id="message" class="error" style="display: none;"></div>
+    <div class="loading" id="loading">Connexion en cours...</div>
+
+    <br>
+    <a href="register.html" class="link">Pas de compte ? S'inscrire</a>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+  import { firebaseConfig } from './firebase-config.js';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      window.location.href = 'accueil.html';
+    }
+  });
+
+  const loginForm = document.getElementById('loginForm');
+  const messageDiv = document.getElementById('message');
+  const loadingDiv = document.getElementById('loading');
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    loadingDiv.style.display = 'block';
+    messageDiv.style.display = 'none';
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        
+        localStorage.setItem('userId', user.uid);
+        localStorage.setItem('userEmail', user.email);
+        localStorage.setItem('username', userData.username);
+
+        messageDiv.textContent = '✅ Connexion réussie ! Redirection...';
+        messageDiv.className = 'success';
+        messageDiv.style.display = 'block';
+
+        setTimeout(() => {
+          window.location.href = 'accueil.html';
+        }, 1000);
+      }
+
+    } catch (error) {
+      loadingDiv.style.display = 'none';
+      
+      let errorMessage = '❌ ';
+      
+      switch(error.code) {
+        case 'auth/invalid-email':
+          errorMessage += 'Email invalide';
+          break;
+        case 'auth/user-not-found':
+          errorMessage += 'Utilisateur non trouvé';
+          break;
+        case 'auth/wrong-password':
+          errorMessage += 'Mot de passe incorrect';
+          break;
+        case 'auth/invalid-credential':
+          errorMessage += 'Email ou mot de passe incorrect';
+          break;
+        default:
+          errorMessage += 'Erreur de connexion';
+      }
+      
+      messageDiv.textContent = errorMessage;
+      messageDiv.className = 'error';
+      messageDiv.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Compte</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: #f5f5f5; }
+
+header { position: fixed; top: 0; width: 100%; background: rgba(60,60,60,0.8); padding: 15px 0; z-index: 10; }
+nav { display: flex; justify-content: center; gap: 40px; }
+nav a { color: white; text-decoration: none; font-weight: 500; }
+nav a:hover { text-decoration: underline; }
+
+.account-top {
+  position: fixed;
+  top: 5px;
+  right: 20px;
+  background: #e91e63;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  z-index: 1000;
+}
+.account-top:hover { background: #c2185b; }
+
+.exit-top {
+  position: fixed;
+  top: 50px;
+  right: 20px;
+  background: #e91e63;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: 500;
+  z-index: 1000;
+  cursor: pointer;
+}
+.exit-top:hover { background: #c2185b; }
+
+.content { margin-top: 100px; max-width: 800px; margin-left: auto; margin-right: auto; padding: 50px 20px; }
+h1 { font-size: 36px; margin-bottom: 30px; text-align: center; color: #333; }
+
+.settings { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+.settings h2 { margin-bottom: 20px; color: #6a11cb; }
+.settings label { display: block; margin-bottom: 5px; font-weight: 500; }
+.settings input { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #ccc; font-size: 16px; }
+.settings button { padding: 12px 25px; border: none; border-radius: 25px; background: #6a11cb; color: white; font-weight: 500; cursor: pointer; transition: 0.3s; }
+.settings button:hover { background: #2575fc; }
+.settings button:disabled { background: #ccc; cursor: not-allowed; }
+
+.message { text-align: center; margin-bottom: 20px; padding: 12px; border-radius: 8px; font-weight: 500; }
+.message.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #66bb6a; }
+.message.error { background: #ffebee; color: #c62828; border: 1px solid #ef5350; }
+
+.loading { text-align: center; color: #666; margin-bottom: 20px; display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="accueil.html">Accueil</a>
+    <a href="culture.html">Culture</a>
+    <a href="quefaire.html">Que faire ?</a>
+    <a href="tarifs.html">Tarifs</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+
+  <a href="account.html" class="account-top">👤 Compte</a>
+  <a class="exit-top" id="logoutBtn">🚪 Exit</a>
+</header>
+
+<div class="content">
+  <h1>Mon Compte</h1>
+
+  <div class="settings">
+    <h2>Paramètres du compte</h2>
+
+    <div id="message" class="message" style="display: none;"></div>
+    <div class="loading" id="loading">Chargement...</div>
+
+    <form id="updateForm">
+      <label for="username">Nom d'utilisateur</label>
+      <input type="text" id="username" name="username" required>
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required readonly style="background: #f5f5f5; cursor: not-allowed;">
+
+      <label for="password">Nouveau mot de passe (laisser vide pour ne pas changer)</label>
+      <input type="password" id="password" name="password" placeholder="Nouveau mot de passe (min. 6 caractères)" minlength="6">
+
+      <button type="submit" id="submitBtn">Mettre à jour</button>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  import { firebaseConfig } from './firebase-config.js';
+  
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const messageDiv = document.getElementById('message');
+  const loadingDiv = document.getElementById('loading');
+  const updateForm = document.getElementById('updateForm');
+  const submitBtn = document.getElementById('submitBtn');
+
+  // Fonction pour afficher un message
+  function showMessage(text, type) {
+    messageDiv.textContent = text;
+    messageDiv.className = `message ${type}`;
+    messageDiv.style.display = 'block';
+    setTimeout(() => {
+      messageDiv.style.display = 'none';
+    }, 5000);
+  }
+
+  // Vérifier l'authentification et charger les données
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    loadingDiv.style.display = 'block';
+
+    try {
+      // Charger les données utilisateur depuis Firestore
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        document.getElementById('username').value = userData.username;
+        document.getElementById('email').value = user.email;
+      }
+
+      loadingDiv.style.display = 'none';
+
+    } catch (error) {
+      console.error('Erreur chargement:', error);
+      showMessage('Erreur lors du chargement des données', 'error');
+      loadingDiv.style.display = 'none';
+    }
+  });
+
+  // Gérer la mise à jour du profil
+  updateForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const newUsername = document.getElementById('username').value.trim();
+    const newPassword = document.getElementById('password').value;
+
+    submitBtn.disabled = true;
+    loadingDiv.style.display = 'block';
+
+    try {
+      // Mettre à jour le nom d'utilisateur dans Firestore
+      await updateDoc(doc(db, 'users', user.uid), {
+        username: newUsername
+      });
+
+      // Mettre à jour localStorage
+      localStorage.setItem('username', newUsername);
+
+      let successMessage = 'Nom d\'utilisateur mis à jour avec succès ✅';
+
+      // Mettre à jour le mot de passe si fourni
+      if (newPassword) {
+        try {
+          await updatePassword(user, newPassword);
+          successMessage = 'Nom d\'utilisateur et mot de passe mis à jour avec succès ✅';
+        } catch (passwordError) {
+          if (passwordError.code === 'auth/requires-recent-login') {
+            showMessage('⚠️ Pour changer le mot de passe, veuillez vous reconnecter d\'abord', 'error');
+          } else {
+            throw passwordError;
+          }
+        }
+      }
+
+      showMessage(successMessage, 'success');
+      document.getElementById('password').value = '';
+
+    } catch (error) {
+      console.error('Erreur mise à jour:', error);
+      showMessage('Erreur lors de la mise à jour', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      loadingDiv.style.display = 'none';
+    }
+  });
+
+  // Gérer la déconnexion
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    try {
+      await signOut(auth);
+      localStorage.clear();
+      window.location.href = 'login.html';
+    } catch (error) {
+      console.error('Erreur déconnexion:', error);
+    }
+  });
+</script>
+
+</body>
+</html>

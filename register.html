@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+        }
+
+        .register-container {
+            background: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            width: 380px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #6a11cb;
+            box-shadow: 0 0 5px rgba(106, 17, 203, 0.5);
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #6a11cb;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background-color: #2575fc;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        a {
+            color: #2575fc;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef5350;
+        }
+
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #66bb6a;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <h2>Inscription</h2>
+        <form id="registerForm">
+            <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Mot de passe (min. 6 caractères)" required minlength="6">
+            <button type="submit" id="submitBtn">S'inscrire</button>
+        </form>
+
+        <div id="message" class="message"></div>
+        <div class="loading" id="loading">Inscription en cours...</div>
+
+        <p>Déjà un compte ? <a href="login.html">Se connecter</a></p>
+    </div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  import { getFirestore, doc, setDoc, serverTimestamp, query, collection, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  import { firebaseConfig } from './firebase-config.js';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const registerForm = document.getElementById('registerForm');
+  const messageDiv = document.getElementById('message');
+  const loadingDiv = document.getElementById('loading');
+  const submitBtn = document.getElementById('submitBtn');
+
+  registerForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const username = document.getElementById('username').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    messageDiv.style.display = 'none';
+    loadingDiv.style.display = 'block';
+    submitBtn.disabled = true;
+
+    try {
+      // Vérifier si l'email existe déjà
+      const emailQuery = query(collection(db, 'users'), where('email', '==', email));
+      const emailSnapshot = await getDocs(emailQuery);
+
+      if (!emailSnapshot.empty) {
+        throw new Error('EMAIL_EXISTS');
+      }
+
+      // Créer le compte Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Créer le document utilisateur dans Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        username: username,
+        email: email,
+        createdAt: serverTimestamp()
+      });
+
+      // Afficher le succès
+      messageDiv.textContent = `✅ Inscription réussie ! Bonjour ${username}`;
+      messageDiv.className = 'message success';
+      messageDiv.style.display = 'block';
+      loadingDiv.style.display = 'none';
+
+      // Stocker les infos
+      localStorage.setItem('userId', user.uid);
+      localStorage.setItem('userEmail', email);
+      localStorage.setItem('username', username);
+
+      // Rediriger après 2 secondes
+      setTimeout(() => {
+        window.location.href = 'accueil.html';
+      }, 2000);
+
+    } catch (error) {
+      loadingDiv.style.display = 'none';
+      submitBtn.disabled = false;
+      
+      let errorMessage = '❌ ';
+
+      if (error.message === 'EMAIL_EXISTS') {
+        errorMessage += 'Cette adresse e-mail est déjà utilisée.';
+      } else {
+        switch(error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage += 'Cette adresse e-mail est déjà utilisée.';
+            break;
+          case 'auth/invalid-email':
+            errorMessage += 'Adresse e-mail invalide.';
+            break;
+          case 'auth/weak-password':
+            errorMessage += 'Le mot de passe doit contenir au moins 6 caractères.';
+            break;
+          default:
+            errorMessage += 'Erreur lors de l\'inscription. Réessayez.';
+        }
+      }
+      
+      messageDiv.textContent = errorMessage;
+      messageDiv.className = 'message error';
+      messageDiv.style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>
