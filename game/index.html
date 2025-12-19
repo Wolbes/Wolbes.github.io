@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pierre Feuille Ciseaux - Kyoto Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/x-icon" href="../images/favicon.ico">
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: rgba(60,60,60,0.9);
+      padding: 15px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      color: white;
+      font-size: 24px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .back-btn {
+      background: #e91e63;
+      color: white;
+      padding: 10px 25px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #c2185b;
+      transform: translateY(-2px);
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-title {
+      color: white;
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 18px;
+      margin-bottom: 40px;
+    }
+
+    .score-board {
+      background: white;
+      padding: 20px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 40px;
+      display: flex;
+      gap: 60px;
+    }
+
+    .score-item {
+      text-align: center;
+    }
+
+    .score-label {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-value {
+      font-size: 36px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .game-area {
+      background: white;
+      padding: 50px;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      text-align: center;
+      min-width: 500px;
+    }
+
+    .choices {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin: 30px 0;
+    }
+
+    .choice {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .choice:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .choice:active {
+      transform: scale(0.95);
+    }
+
+    .result-area {
+      margin-top: 30px;
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .result-text {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .result-text.win { color: #4caf50; }
+    .result-text.lose { color: #f44336; }
+    .result-text.draw { color: #ff9800; }
+
+    .battle-display {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      margin: 20px 0;
+    }
+
+    .player-choice, .computer-choice {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .choice-icon {
+      font-size: 80px;
+      animation: bounceIn 0.5s;
+    }
+
+    .choice-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #666;
+    }
+
+    .vs {
+      font-size: 32px;
+      font-weight: 700;
+      color: #667eea;
+    }
+
+    .play-again-btn {
+      margin-top: 20px;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .play-again-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .instructions {
+      margin-top: 20px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 768px) {
+      .game-title { font-size: 36px; }
+      .game-area { 
+        min-width: auto; 
+        width: 100%;
+        padding: 30px 20px;
+      }
+      .choices { gap: 15px; }
+      .choice { 
+        width: 90px; 
+        height: 90px; 
+        font-size: 45px; 
+      }
+      .score-board { gap: 30px; padding: 20px; }
+      .battle-display { gap: 20px; }
+      .choice-icon { font-size: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../accueil.html" class="logo">⛩ Kyoto Travel</a>
+  <a href="../accueil.html" class="back-btn">← Retour</a>
+</header>
+
+<div class="container">
+  <h1 class="game-title">Pierre Feuille Ciseaux</h1>
+  <p class="subtitle">Choisissez votre arme !</p>
+
+  <div class="score-board">
+    <div class="score-item">
+      <div class="score-label">Vous</div>
+      <div class="score-value" id="playerScore">0</div>
+    </div>
+    <div class="score-item">
+      <div class="score-label">Égalité</div>
+      <div class="score-value" id="drawScore">0</div>
+    </div>
+    <div class="score-item">
+      <div class="score-label">Ordinateur</div>
+      <div class="score-value" id="computerScore">0</div>
+    </div>
+  </div>
+
+  <div class="game-area">
+    <h2>Faites votre choix</h2>
+    
+    <div class="choices">
+      <div class="choice" data-choice="rock" title="Pierre">
+        🪨
+      </div>
+      <div class="choice" data-choice="paper" title="Feuille">
+        📄
+      </div>
+      <div class="choice" data-choice="scissors" title="Ciseaux">
+        ✂️
+      </div>
+    </div>
+
+    <div class="result-area" id="resultArea">
+      <p class="instructions">Cliquez sur une icône pour jouer</p>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  
+  // Import Firebase config
+  import { firebaseConfig } from '../firebase-config.js';
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Protection de la page
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = '../login.html';
+    }
+  });
+
+  // Game logic
+  const choices = document.querySelectorAll('.choice');
+  const resultArea = document.getElementById('resultArea');
+  const playerScoreEl = document.getElementById('playerScore');
+  const computerScoreEl = document.getElementById('computerScore');
+  const drawScoreEl = document.getElementById('drawScore');
+
+  let playerScore = 0;
+  let computerScore = 0;
+  let drawScore = 0;
+
+  const choiceEmojis = {
+    rock: '🪨',
+    paper: '📄',
+    scissors: '✂️'
+  };
+
+  const choiceNames = {
+    rock: 'Pierre',
+    paper: 'Feuille',
+    scissors: 'Ciseaux'
+  };
+
+  choices.forEach(choice => {
+    choice.addEventListener('click', () => {
+      const playerChoice = choice.dataset.choice;
+      playGame(playerChoice);
+    });
+  });
+
+  function playGame(playerChoice) {
+    const choices = ['rock', 'paper', 'scissors'];
+    const computerChoice = choices[Math.floor(Math.random() * 3)];
+    
+    const result = getResult(playerChoice, computerChoice);
+    
+    updateScore(result);
+    displayResult(playerChoice, computerChoice, result);
+  }
+
+  function getResult(player, computer) {
+    if (player === computer) return 'draw';
+    
+    if (
+      (player === 'rock' && computer === 'scissors') ||
+      (player === 'paper' && computer === 'rock') ||
+      (player === 'scissors' && computer === 'paper')
+    ) {
+      return 'win';
+    }
+    
+    return 'lose';
+  }
+
+  function updateScore(result) {
+    if (result === 'win') playerScore++;
+    else if (result === 'lose') computerScore++;
+    else drawScore++;
+    
+    playerScoreEl.textContent = playerScore;
+    computerScoreEl.textContent = computerScore;
+    drawScoreEl.textContent = drawScore;
+  }
+
+  function displayResult(playerChoice, computerChoice, result) {
+    const resultMessages = {
+      win: '🎉 Vous avez gagné !',
+      lose: '😢 Vous avez perdu...',
+      draw: '🤝 Égalité !'
+    };
+
+    resultArea.innerHTML = `
+      <div class="battle-display">
+        <div class="player-choice">
+          <div class="choice-name">Vous</div>
+          <div class="choice-icon">${choiceEmojis[playerChoice]}</div>
+          <div class="choice-name">${choiceNames[playerChoice]}</div>
+        </div>
+        
+        <div class="vs">VS</div>
+        
+        <div class="computer-choice">
+          <div class="choice-name">Ordinateur</div>
+          <div class="choice-icon">${choiceEmojis[computerChoice]}</div>
+          <div class="choice-name">${choiceNames[computerChoice]}</div>
+        </div>
+      </div>
+      
+      <div class="result-text ${result}">${resultMessages[result]}</div>
+      <button class="play-again-btn" onclick="location.reload()">🔄 Nouvelle partie</button>
+    `;
+  }
+</script>
+
+</body>
+</html>
